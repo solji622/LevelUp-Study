@@ -49,7 +49,47 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
 
 ## 📌 스프링 시큐리티 인증 처리 과정
 ![스프링 아키텍쳐](https://github.com/solji622/LevelUp-Study/blob/ab83e8ad3888371a120a378a99c8b6adadb39734/25.03/Spring%20Security/asset/%EC%8A%A4%ED%94%84%EB%A7%81%20%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90.png)
+1. **Http Request 수신** <br>
+   사용자(클라이언트)가 로그인 정보와 함께 인증 요청을 한다. <br>
+   <br>
 
+2. **유저 자격 기반 인증 토큰 생성** <br>
+   AuthenticationFilter가 인증 요청을 가로채서 UsernamePasswordAuthenticationToken(이하 UserToken) 이라는 인증용 객체를 생성한다. <br>
+   해당 객체는 요청을 처리할 수 있는 Provider을 찾는데 사용된다. <br>
+   <br>
+
+3. **필터를 통해 UserToken을 AuthenticationManager로 위임** <br>
+   AuthenticationManager의 구현체인 ProviderManager에게 생성한 UserToken 객체를 전달한다. <br>
+   <br>
+
+4. **AuthenticationProvider의 목록으로 인증 시도** <br>
+   AuthenticationManager는 AuthenticationProvider에게(실제 인증을 할 역할) UserToken을 다시 전달하고 <br>
+   등록된 AuthenticationProvider들을 조회하여 인증을 요구한다. <br>
+   <br>
+
+5. **UserDetailsService에서 조회** <br>
+    데이터베이스에서 사용자 인증 정보를 가져올 UserDetailsService에게 AuthenticationProvider가 사용자 아이디를 전달하여 사용자 정보를 조회한다. <br>
+   <br>
+   
+6. **UserDetails를 이용해 User객체에 대한 정보 탐색** <br>
+   UserDetailsService을 통해 넘겨받은 사용자 정보로 UserDetails 객체를 만든다. <br>
+   <br>
+
+7. **User 객체의 정보들을 UserDetails가 UserDetailsService(LoginService)로 전달** <br>
+   AuthenticaitonProvider들은 UserDetails를 넘겨받고 사용자 정보와 화면에서 입력한 로그인 정보를 비교한다. <br>
+   <br>
+
+8. **비교 후 Authentication 반환** <br>
+    인증이 완료 후 권한 등의 사용자 정보를 담은 Authentication 객체를 반환한다. <br>
+   <br>
+
+9. **인증 완료, Filter에게 반환** <br>
+    다시 최초의 AuthenticationFilter에 Authentication 객체가 반환된다. <br>
+   <br>
+
+10. **SecurityContext에 인증 객체를 설정** <br>
+    필터로 반환된 Authentication 객체를 Security Context에 저장한다. <br>
+   <br>
 
 
 
