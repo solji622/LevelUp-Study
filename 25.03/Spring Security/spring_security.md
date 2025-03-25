@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/d982edbc-bf16-40c5-b847-02afab81a25e)# Spring Security (스프링 시큐리티)
+# Spring Security (스프링 시큐리티)
 &nbsp;
 
 ## 📌 스프링 시큐리티란
@@ -98,6 +98,28 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
 <br>
 
 ## 📌 스프링 시큐리티의 주요 모듈
+
+### ▪️SecurityContextHolder
+보안 주체의 세부 정보를 포함하여 응용 프로그램의 현재 보안 context에 대한 세부 정보를 저장한다. <br>
+기본적으로 아래 두가지의 방법이 제공된다.
+~~~
+SecurityContextHolder.MODE_INHERITABLETHREADLOCAL  # 스레드당 SecurityContext 객체 할당 (default)
+SecurityContextHolder.MODE_THREADLOCAL  # 메인과 자식 스레드에 관하여 동일한 SecurityContext 유지
+~~~
+
+<br>
+<br>
+
+### ▪️SecurityContext
+Authentication 보관 및 Authentication 객체 가져오기 역할
+~~~
+SecurityContextHolder.getContext().setAuthentication(authentication);
+SecurityContextHolder.getContext().getAuthentication(authentication);
+~~~
+
+<br>
+<br>
+
 ### ▪️Authentication
 현재 접근하는 주체의 정보와 권한을 담는 인터페이스, Authentication 객체는 Security Context에 저장되며 <br>
 SecurityContextHolder를 통해 SecurityContext에 접근하고, SecurityContext를 통해 Authentication에 접근할 수 있다. <br>
@@ -106,7 +128,7 @@ public interface Authentication extends Principal, Serialzable {
     // 현재 사용자의 권한 목록을 가져옴
     Collection<? extends GrantedAuthority> getAuthorities();
     
-    // Principal 객체
+    // Principal(현재 인증된 사용자) 객체
     Object getPrincipal();
     
     // credentials 객체
@@ -123,31 +145,134 @@ public interface Authentication extends Principal, Serialzable {
 ~~~
 
 <br>
-
-### ▪️SecurityContextHolder
-보안 주체의 세부 정보를 포함하여 응용 프로그램의 현재 보안 context에 대한 세부 정보를 저장한다. <br>
-기본적으로 아래 두가지의 방법이 제공된다.
-~~~
-SecurityContextHolder.MODE_INHERITABLETHREADLOCAL  # 스레드당 SecurityContext 객체 할당 (default)
-SecurityContextHolder.MODE_THREADLOCAL  # 메인과 자식 스레드에 관하여 동일한 SecurityContext 유지
-~~~
-
-<br>
-
-### ▪️SecurityContext
-Authentication 보관 및 Authentication 객체 가져오기 역할
-~~~
-SecurityContextHolder.getContext().setAuthentication(authentication);
-SecurityContextHolder.getContext().getAuthentication(authentication);
-~~~
-
 <br>
 
 ### ▪️UsernamePasswordAuthenticationToken
+Authentication을 implements(구현)한 AbstractAuthenticationToken의 하위 클래스 <br>
+사용자 아이디가 Principal 역할을, 비밀번호가 Credential 역할을 한다. <br>
+첫 번째 생성자는 인증 전의 객체를, 두 번째 생성자는 인증 완료 객체를 생성한다. <br>
+~~~ java
+public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationToken {
 
+    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
+    // 사용자의 Id
+    private final Object principal;
+    // 사용자의 Password
+    private Object credentials;
+    
+    // 인증 전 객체 생성
+    public UsernamePasswordAuthenticationToken(Object principal, Object credentials) {
+        super(null);
+        this.principal = principal;
+        this.credentials = credentials;
+        setAuthenticated(false);
+    }
+    
+    // 인증 완료 객체 생성
+    public UsernamePasswordAuthenticationToken(
+    	Object principal,
+        Object credentials,
+        Collection<? extends GrantedAuthority> authorities
+    ) {
+        super(authorities);
+        this.principal = principal;
+        this.credentials = credentials;
+        setAuthenticated(true);
+    }
+}
 
+public abstract class AbstractAuthentiacationToken implements Authentication, CredentialsContainer {
+}
+~~~
 
+<br>
+<br>
 
+### ▪️AuthenticationManager
+인증에 대한 부분 처리를 담당한다. 실질적으로는 AuthenticationManager에 등록된 AuthenticationProvider에 의해 인증이 처리된다. <br>
+인증 성공 시 UsernamePasswordAuthenticationToken의 두 번째 생성자를 이용해 인증 완료 객체를 생성하여 Security Context에 저장한다. <br>
+더불어 인증 상태 유지를 위해 세션에 보관하며 인증 실패 시 AuthenticationException을 발생시킨다.
+~~~ java
+public interface AuthenticationManager {
+    Authentication authenticate(Authentication authentication) throws AuthenticationException;
+}
+~~~
+
+<br>
+<Br>
+
+### ▪️AuthenticationProvider
+실질적인 인증을 처리한다. 인증 전의 객체를 전달받아 인증 완료 객체를 반환하는 역할을 한다. <br>
+인터페이스를 구현해서 custom AuthenticationProvider를 작성하고 AuthenticationManager에 등록하면 된다. <br>
+~~~ java
+public interface AuthenticationProvider {
+    // 인증 전의 Authentication 객체를 받아서 인증된 Authentication 객체를 반환
+    Authentication authenticate(Authentication var1) throws AuthenticationException;
+    
+    boolean supports(Class<?> var1);
+}
+~~~
+
+<br>
+<br>
+
+### ▪️UserDetails
+인증에 성공하여 생성된 객체, Authentication 객체를 구현한 UsernamePasswordAuthenticationToken을 생성하기 위해 사용된다. <br>
+``` java
+public interface UserDetails extends Serializable {
+
+    Collection<? extends GrantedAuthority> getAuthorities();
+
+    String getPassword();
+
+    String getUsername();
+
+    boolean isAccountNonExpired();
+
+    boolean isAccountNonLocked();
+
+    boolean isCredentialsNonExpired();
+
+    boolean isEnabled();
+    
+}
+```
+
+<br>
+<br>
+
+### ▪️UserDetailService
+UserDetails 객체를 반환하는 하나의 메소드만을 가진다. <br>
+일반적으로 UserDetailService 클래스 내부에 UserRepository을 주입 받아 DB와 연결하여 처리한다. <br>
+``` java
+public interface UserDetailsService {
+    UserDetails loadUserByUsername(String var1) throws UsernameNotFoundException;
+}
+```
+
+<br>
+<br>
+
+### ▪️PasswordEncoder
+AuthenticationManagerBuilder.userDetailsService().passwordEncoder()를 통해 패스워드 암호화에 사용될 PasswordEncoder 구현체를 지정한다.
+``` java
+@Override
+protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    auth.userDetailsService(userDetialsService).passwordEncoder(passwordEncoder());
+}
+
+@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+```
+
+<br>
+<br>
+
+### ▪️GrantedAuthority
+현재 사용자가 가지고 있는 권한이다. ROLE_*의 형태로 사용하며 보통은 'roles' 라고 칭한다. <br>
+객체는 UserDetailsService에 의해 불러올 수 있고, 특정 자원에 대한 권한 유무를 검사하여 접근 허용 여부를 결정한다. <br>
 
 
