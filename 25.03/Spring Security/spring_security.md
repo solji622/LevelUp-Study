@@ -68,7 +68,8 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
    <br>
 
 5. **UserDetailsService에서 조회** <br>
-    데이터베이스에서 사용자 인증 정보를 가져올 UserDetailsService에게 AuthenticationProvider가 사용자 아이디를 전달하여 사용자 정보를 조회한다. <br>
+   데이터베이스에서 사용자 인증 정보를 가져올 UserDetailsService에게 <br>
+   AuthenticationProvider가 사용자 아이디를 전달하여 사용자 정보를 조회한다. <br>
    <br>
    
 6. **UserDetails를 이용해 User객체에 대한 정보 탐색** <br>
@@ -91,7 +92,13 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
     필터로 반환된 Authentication 객체를 Security Context에 저장한다. <br>
    <br>
 
+<br>
+<br>
+<br>
+<br>
 
+## 📌 스프링 시큐리티의 주요 모듈
+### 
 
 
 
