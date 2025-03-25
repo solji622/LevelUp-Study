@@ -1,4 +1,4 @@
-# Spring Security (스프링 시큐리티)
+![image](https://github.com/user-attachments/assets/d982edbc-bf16-40c5-b847-02afab81a25e)# Spring Security (스프링 시큐리티)
 &nbsp;
 
 ## 📌 스프링 시큐리티란
@@ -48,7 +48,7 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
 <br>
 
 ## 📌 스프링 시큐리티 인증 처리 과정
-![스프링 아키텍쳐](https://github.com/solji622/LevelUp-Study/blob/ab83e8ad3888371a120a378a99c8b6adadb39734/25.03/Spring%20Security/asset/%EC%8A%A4%ED%94%84%EB%A7%81%20%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90.png)
+![스프링 아키텍쳐](https://github.com/solji622/LevelUp-Study/blob/546f9b3c7d28ea33167ebc41f7f647e2837a0130/25.03/Spring%20Security/asset/%EC%8A%A4%ED%94%84%EB%A7%81%20%EC%8B%9C%ED%81%90%EB%A6%AC%ED%8B%B0%20%EB%8F%99%EC%9E%91%20%EA%B3%BC%EC%A0%95_%ED%95%9C%EA%B5%AD%EC%96%B4.png)
 1. **Http Request 수신** <br>
    사용자(클라이언트)가 로그인 정보와 함께 인증 요청을 한다. <br>
    <br>
@@ -98,7 +98,56 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
 <br>
 
 ## 📌 스프링 시큐리티의 주요 모듈
-### 
+### ▪️Authentication
+현재 접근하는 주체의 정보와 권한을 담는 인터페이스, Authentication 객체는 Security Context에 저장되며 <br>
+SecurityContextHolder를 통해 SecurityContext에 접근하고, SecurityContext를 통해 Authentication에 접근할 수 있다. <br>
+~~~ java
+public interface Authentication extends Principal, Serialzable {
+    // 현재 사용자의 권한 목록을 가져옴
+    Collection<? extends GrantedAuthority> getAuthorities();
+    
+    // Principal 객체
+    Object getPrincipal();
+    
+    // credentials 객체
+    Object getCredentials();
+    
+    Object getDetails();
+    
+    // 인증 여부
+    boolean isAuthenticated();
+    
+    // 인증 여부를 설정
+    void setAuthenticated(boolean isAuthenticated) thrwos IllegalArgumentException;
+ }
+~~~
+
+<br>
+
+### ▪️SecurityContextHolder
+보안 주체의 세부 정보를 포함하여 응용 프로그램의 현재 보안 context에 대한 세부 정보를 저장한다. <br>
+기본적으로 아래 두가지의 방법이 제공된다.
+~~~
+SecurityContextHolder.MODE_INHERITABLETHREADLOCAL  # 스레드당 SecurityContext 객체 할당 (default)
+SecurityContextHolder.MODE_THREADLOCAL  # 메인과 자식 스레드에 관하여 동일한 SecurityContext 유지
+~~~
+
+<br>
+
+### ▪️SecurityContext
+Authentication 보관 및 Authentication 객체 가져오기 역할
+~~~
+SecurityContextHolder.getContext().setAuthentication(authentication);
+SecurityContextHolder.getContext().getAuthentication(authentication);
+~~~
+
+<br>
+
+### ▪️UsernamePasswordAuthenticationToken
+
+
+
+
 
 
 
