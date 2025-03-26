@@ -288,6 +288,7 @@ implementation 'org.springframework.boot:spring-boot-starter-security'
 <br>
 
 ### 2. 시큐리티 활성화용 SecurityConfig 추가
+<img src="https://github.com/solji622/LevelUp-Study/blob/01750cfec9aed37002f2a8e0355fd6d4f63743b3/25.03/Spring%20Security/asset/security_login_page.png" width="70%"/>
 기본적으로 사용을 하게 되면 모든 페이지에 대해서 로그인을 하도록 되어있기에 매우 번거로워진다. <br>
 이때 Config 파일을 통해서 모든 사용자의 접속을 허용시킬 수 있다.
 ``` java
