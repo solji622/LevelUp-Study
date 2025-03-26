@@ -131,7 +131,7 @@ public interface Authentication extends Principal, Serialzable {
     // Principal(현재 인증된 사용자) 객체
     Object getPrincipal();
     
-    // credentials 객체
+    // credentials(자격, 증명) 객체
     Object getCredentials();
     
     Object getDetails();
