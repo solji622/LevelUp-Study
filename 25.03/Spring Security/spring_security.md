@@ -125,7 +125,7 @@ SecurityContextHolder.getContext().getAuthentication(authentication);
 SecurityContextHolder를 통해 SecurityContext에 접근하고, SecurityContext를 통해 Authentication에 접근할 수 있다. <br>
 ~~~ java
 public interface Authentication extends Principal, Serialzable {
-    // 현재 사용자의 권한 목록을 가져옴
+    // 현재 사용자의 권한(ROLE_ADMIN 등) 목록을 가져옴
     Collection<? extends GrantedAuthority> getAuthorities();
     
     // Principal(현재 인증된 사용자) 객체
@@ -139,7 +139,7 @@ public interface Authentication extends Principal, Serialzable {
     // 인증 여부
     boolean isAuthenticated();
     
-    // 인증 여부를 설정
+    // 인증 여부를 설정 (강제 설정 가능)
     void setAuthenticated(boolean isAuthenticated) thrwos IllegalArgumentException;
  }
 ~~~
@@ -166,7 +166,7 @@ public class UsernamePasswordAuthenticationToken extends AbstractAuthenticationT
         super(null);
         this.principal = principal;
         this.credentials = credentials;
-        setAuthenticated(false);
+        setAuthenticated(false); // 인증 전이기에 false
     }
     
     // 인증 완료 객체 생성
@@ -209,7 +209,8 @@ public interface AuthenticationManager {
 public interface AuthenticationProvider {
     // 인증 전의 Authentication 객체를 받아서 인증된 Authentication 객체를 반환
     Authentication authenticate(Authentication var1) throws AuthenticationException;
-    
+
+    // 지원하는 Authentication 타입인지 확인인
     boolean supports(Class<?> var1);
 }
 ~~~
@@ -225,15 +226,12 @@ public interface UserDetails extends Serializable {
     Collection<? extends GrantedAuthority> getAuthorities();
 
     String getPassword();
-
     String getUsername();
 
     boolean isAccountNonExpired();
-
     boolean isAccountNonLocked();
 
     boolean isCredentialsNonExpired();
-
     boolean isEnabled();
     
 }
@@ -259,12 +257,12 @@ AuthenticationManagerBuilder.userDetailsService().passwordEncoder()를 통해 �
 ``` java
 @Override
 protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    auth.userDetailsService(userDetialsService).passwordEncoder(passwordEncoder());
+    auth.userDetailsService(userDetialsService).passwordEncoder(passwordEncoder()); // 사용자 정보 조회하여 비밀번호 비교
 }
 
 @Bean
 public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder(); // 비밀번호 암호화
 }
 ```
 
