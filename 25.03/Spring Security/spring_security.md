@@ -273,4 +273,63 @@ public PasswordEncoder passwordEncoder() {
 현재 사용자가 가지고 있는 권한이다. ROLE_*의 형태로 사용하며 보통은 'roles' 라고 칭한다. <br>
 객체는 UserDetailsService에 의해 불러올 수 있고, 특정 자원에 대한 권한 유무를 검사하여 접근 허용 여부를 결정한다. <br>
 
+<br>
+<br>
+<br>
+<br>
 
+## 📌 스프링 시큐리티 사용하기
+### 1. 의존성 추가
+``` gradle
+implementation 'org.springframework.boot:spring-boot-starter-security'
+```
+
+<br>
+<br>
+
+### 2. 시큐리티 활성화용 SecurityConfig 추가
+기본적으로 사용을 하게 되면 모든 페이지에 대해서 로그인을 하도록 되어있기에 매우 번거로워진다. <br>
+이때 Config 파일을 통해서 모든 사용자의 접속을 허용시킬 수 있다.
+``` java
+package com.example.demo;
+
+// import 생략
+
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+public class SecurityConfig {
+	@Bean
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+		http
+			.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+			.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
+			.csrf((csrf) -> csrf.ignoringRequestMatchers
+					(new AntPathRequestMatcher("/h2-console/**")))
+			.headers((headers) -> headers
+					.addHeaderWriter(new XFrameOptionsHeaderWriter(
+							XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+			.formLogin((formLogin) -> formLogin
+					.loginPage("/user/login")
+					.defaultSuccessUrl("/"))
+			.logout((logout) -> logout
+				.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
+				.logoutSuccessUrl("/")
+				.invalidateHttpSession(true))
+			;
+		
+		return http.build();
+	}
+	
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration
+	authenticationConfiguration) throws Exception {
+		return authenticationConfiguration.getAuthenticationManager();
+	}
+}
+```
