@@ -290,7 +290,8 @@ implementation 'org.springframework.boot:spring-boot-starter-security'
 ### 2. 시큐리티 활성화용 SecurityConfig 추가
 <img src="https://github.com/solji622/LevelUp-Study/blob/01750cfec9aed37002f2a8e0355fd6d4f63743b3/25.03/Spring%20Security/asset/security_login_page.png" width="70%"/>
 기본적으로 사용을 하게 되면 모든 페이지에 대해서 로그인을 하도록 되어있기에 매우 번거로워진다. <br>
-이때 Config 파일을 통해서 모든 사용자의 접속을 허용시킬 수 있다.
+이때 Config 파일을 통해서 모든 사용자의 접속을 허용시킬 수 있다. <br>
+
 ``` java
 package com.example.demo;
 
@@ -298,35 +299,37 @@ package com.example.demo;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true) // 메서드 수준에서 보안 설정 가능
 public class SecurityConfig {
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception { // 시큐리티의 필터 체인 설정
 		http
 			.authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
 			.requestMatchers(new AntPathRequestMatcher("/**")).permitAll())
-			.csrf((csrf) -> csrf.ignoringRequestMatchers
+			.csrf((csrf) -> csrf.ignoringRequestMatchers // CSRF 보안 검사 제외
 					(new AntPathRequestMatcher("/h2-console/**")))
 			.headers((headers) -> headers
 					.addHeaderWriter(new XFrameOptionsHeaderWriter(
-							XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
+							XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN))) // 클릭재킹 공격 방지(같은 도메인에서만 접근 가능)
 			.formLogin((formLogin) -> formLogin
-					.loginPage("/user/login")
-					.defaultSuccessUrl("/"))
+					.loginPage("/user/login") 
+					.defaultSuccessUrl("/")) // 로그인 성공 시 페이지 리다이렉트
 			.logout((logout) -> logout
 				.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout"))
 				.logoutSuccessUrl("/")
-				.invalidateHttpSession(true))
+				.invalidateHttpSession(true)) // 로그아웃 시 세션 무효화
 			;
 		
 		return http.build();
 	}
 	
+	// 비밀번호 암호화
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
+	// 사용자 인증 관리
 	@Bean
 	AuthenticationManager authenticationManager(AuthenticationConfiguration
 	authenticationConfiguration) throws Exception {
@@ -334,3 +337,12 @@ public class SecurityConfig {
 	}
 }
 ```
+**`.requestMatchers(new AntPathRequestMatcher("/**")).permitAll()`** 이 코드를 통해 <br>
+모든 경로 (/**)에 대해 접근이 허용되었다. 즉, 로그인 필요 없이 모든 페이지에 접근이 가능해진다. <br>
+
+
+<br>
+<br>
+<br>
+<br>
+
