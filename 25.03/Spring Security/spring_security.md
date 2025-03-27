@@ -280,7 +280,7 @@ public PasswordEncoder passwordEncoder() {
 
 ## 📌 스프링 시큐리티 사용하기
 ### 1. 의존성 추가
-build.grale 파일에 spring security를 추가한다. 
+build.gradle 파일에 spring security를 추가한다. 
 
 ``` gradle
 implementation 'org.springframework.boot:spring-boot-starter-security'
