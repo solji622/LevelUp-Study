@@ -80,7 +80,7 @@ Spring 기반 애플리케이션의 **인증, 인가** 및 보안을 담당하�
    AuthenticaitonProvider들은 UserDetails를 넘겨받고 사용자 정보와 화면에서 입력한 로그인 정보를 비교한다. <br>
    <br>
 
-8. **비교 후 Authentication 반환** <br>
+8. **비교 후 Authentication(UserToken) 반환** <br>
     인증이 완료 후 권한 등의 사용자 정보를 담은 Authentication 객체를 반환한다. <br>
    <br>
 
