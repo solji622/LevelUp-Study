@@ -89,11 +89,48 @@
 국제 인터넷 표준화 기구(Internet Engineering Task Force, IETF)에서 만우절 장난으로 나온 상태 코드다. <br>
 매년 만우절에 장난으로 기술문서인 RFC를 출판하는데, 418은 1998년에 출판된 RFC 내용의 일부다. <br>
 
-![teapot](https://github.com/solji622/LevelUp-Study/blob/86552272dbcdb16bdf5cf94f66076ef7337f9670/25.04/HTTP%20Status%20Code/asset/418_teapot.png)
+<img src="https://github.com/solji622/LevelUp-Study/blob/86552272dbcdb16bdf5cf94f66076ef7337f9670/25.04/HTTP%20Status%20Code/asset/418_teapot.png" width="70%"/>
 
 418은 커피 주전자용 프로토콜(Hyper Text Coffee Pot Control Protocol, HTCPCP)에서 비롯되었다. <br>
 클라이언트가 찻 주전자에게 커피를 끓여달라는 요청을 하였을 때의 에러 코드로 <br>
 HTCPCP의 메소드 BREW를 서버에게 요청했을 때 나타난다. <br>
+
+구글에서 https://www.google.com/teapot 에 접속하면 실제로 418을 보여준다! <br>
+![이스터에그](https://github.com/solji622/LevelUp-Study/blob/745f967e1249cddf9c0e881425627100934f8a5e/25.04/HTTP%20Status%20Code/asset/google.gif)
+
+또한 body가 "short and stout."인 이유는 *I'm A Little Teapot Song* 의 가사에서 가져왔기 때문이다. <br>
+<br>
+<img src="https://github.com/solji622/LevelUp-Study/blob/745f967e1249cddf9c0e881425627100934f8a5e/25.04/HTTP%20Status%20Code/asset/song.png" width="70%"/>
+
+<br>
+<Br>
+<br>
+
+## 📌 5XX [Server Error]
+> 서버 오류, 4XX와 동일하게 문법 오류로 인한 것이나 원인은 서버에게 있다 <br>
+4XX는 요청 메시지 수정 후 재전송으로 해결이 가능하지만<Br>
+5XX는 서버 문제로 서버 자체의 상태를 확인해야만 해결이 가능하다<br>
+표에 있는 것 외에도 비공식으로 506, 510, 599가 있다 <br>
+
+|status code|message|desc|
+|:---|:---|:---|
+|500|Internal Server Error|서버 내부 문제 발생, 처리가 불가능함|
+|501|Not Implemented|요청에 대해 구현되지 않았음, 서버가 지원하지 않아 처리가 불가능함|
+|502|Bad Gateway|게이트웨이가 잘못되어, 서버가 잘못된 응답을 수신함 <br> (ex. 접속 폭주로 인한 통신 장애)|
+|503|Service Unavailable|서버가 요청을 처리할 준비가 되지 않음 (서비스 이용 불가)|
+|504|Gateway Timeout|게이트웨이 시간 초과, 요청 처리를 중단하고 연결을 끊음|
+|505|HTTP Version Not Supported|서버에서 지원되지 않는 HTTP 버전|
+|511|Network Authentication Required|네트워크 인증 요구|
+
+<br>
+<Br>
+<br>
+
+## 💡 그 외..
+https://http.cat/ 에 접속하여 주소창에 `https://http.cat/[status_code]` 를 입력하면 에러 코드를 고양이짤로 표현해준다 <br>
+<br>
+<img src="https://github.com/solji622/LevelUp-Study/blob/9b3353c81414bfb055070faff862a1f6ef52d97f/25.04/HTTP%20Status%20Code/asset/HTTP_CAT.png" width="70%">
+
 
 
  
