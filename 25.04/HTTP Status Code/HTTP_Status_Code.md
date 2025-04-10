@@ -128,6 +128,7 @@ HTCPCP의 메소드 BREW를 서버에게 요청했을 때 나타난다. <br>
 <br>
 <Br>
 <br>
+<br>
 
 ## 📌 5XX [Server Error]
 > 서버 오류, 4XX와 동일하게 문법 오류로 인한 것이나 원인은 서버에게 있다 <br>
@@ -172,6 +173,7 @@ public class GatewayExamController {
 
 <br>
 <Br>
+<br>
 <br>
 
 ## 💡 그 외..
