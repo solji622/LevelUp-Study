@@ -1,9 +1,12 @@
-# HTTP 상태 코드 (HTTP Status Code)
+![image](https://github.com/user-attachments/assets/fd31dc6b-bbc2-42b5-a167-f8871a02d1b0)# HTTP 상태 코드 (HTTP Status Code)
 <br>
 <br>
 
 ## 📌 HTTP 상태 코드란?
 특정 HTTP 요청의 성공 유무를 서버에서 알려주는 숫자 코드 <br>
+<br>
+
+<img src="https://github.com/solji622/LevelUp-Study/blob/d06506ba3a1bc3524f95e22cdcdc29d8701f80ac/25.04/HTTP%20Status%20Code/asset/exam.png" width="50%"><br>
 <br>
 ![개발자 도구 네트워크탭](https://github.com/solji622/LevelUp-Study/blob/bf5dbf52c3ec2b66790d9cca0eddf24e2fd86ff5/25.04/HTTP%20Status%20Code/asset/chromeNetwork.png)
 <br>
@@ -66,7 +69,27 @@
 |308|Permanent Redirect|요청이 **영구적으로** 다른 URL에 존재함|
 
 <br>
+<br>
+
+### ❓ 일시적으로, 영구적으로
+|status code|message|method|
+|:---|:---|:---|
+|301|Moved Permanently|유지 X (POST → GET)|
+|302|Found|유지 X (POST → GET)|
+|307|Temporary Redirect|유지 (POST)|
+|308|Permanent Redirect|유지 (POST)|
+
+일시적, 영구적 리다이렉션은 리다이렉션의 속성이다.
+> 일시적 리다이렉션 : 리소스 위치 잠깐 변경, 클라이언트는 다음에도 기존 주소로 요청 <br>
+> 영구적 리다이렉션 : 리소스 위치 완전 변경, 클라이언트는 다음에 새로운 주소로 요청
+
+비유를 한다면 **이사 가냐, 출장 가냐**의 차이라 할 수 있다. <br>
+이때 301 & 302는 가는 방식이 바뀔 수 있고 <br>
+307 & 308은 가는 방식이 그대로 유지되는 점에서 다르다고 볼 수 있다.<br>
+
+<br>
 <Br>
+<br>
 <br>
 
 ## 📌 4XX [Client Error]
@@ -121,6 +144,31 @@ HTCPCP의 메소드 BREW를 서버에게 요청했을 때 나타난다. <br>
 |504|Gateway Timeout|게이트웨이 시간 초과, 요청 처리를 중단하고 연결을 끊음|
 |505|HTTP Version Not Supported|서버에서 지원되지 않는 HTTP 버전|
 |511|Network Authentication Required|네트워크 인증 요구|
+<br>
+
+#### ▪️504 예시 코드
+
+```java
+package com.example.demo;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/error-demo")
+public class GatewayExamController {
+    // 504 Gateway Timeout
+    @GetMapping("/504")
+    public ResponseEntity<String> gatewayTimeout() throws InterruptedException {
+        Thread.sleep(5000); // 일부러 지연
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
+                .body("게이트웨이 시간 초과로 인해 연결이 끊겼습니다.");
+    }
+}
+```
 
 <br>
 <Br>
