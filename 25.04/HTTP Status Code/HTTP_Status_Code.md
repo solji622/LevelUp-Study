@@ -1,4 +1,5 @@
-![image](https://github.com/user-attachments/assets/fd31dc6b-bbc2-42b5-a167-f8871a02d1b0)# HTTP 상태 코드 (HTTP Status Code)
+
+# HTTP 상태 코드 (HTTP Status Code)
 <br>
 <br>
 
