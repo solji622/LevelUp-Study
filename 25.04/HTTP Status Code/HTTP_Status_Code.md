@@ -148,30 +148,6 @@ HTCPCP의 메소드 BREW를 서버에게 요청했을 때 나타난다. <br>
 |511|Network Authentication Required|네트워크 인증 요구|
 <br>
 
-#### ▪️504 예시 코드
-
-```java
-package com.example.demo;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-@Controller
-@RequestMapping("/error-demo")
-public class GatewayExamController {
-    // 504 Gateway Timeout
-    @GetMapping("/504")
-    public ResponseEntity<String> gatewayTimeout() throws InterruptedException {
-        Thread.sleep(5000); // 일부러 지연
-        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
-                .body("게이트웨이 시간 초과로 인해 연결이 끊겼습니다.");
-    }
-}
-```
-
 <br>
 <Br>
 <br>
