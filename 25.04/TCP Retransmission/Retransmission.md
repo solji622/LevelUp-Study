@@ -110,8 +110,22 @@ RTT가 예측값과 **많이 다르면, DevRTT가 커지고** RTT가 **안정적
 <br>
 <br>
 
-## 📌 재전송 최적화 알고리즘
+## 📌 Wireshark로 보는 TCP 재전송 예제
+> #### Wireshark란?
+> 대표적인 패킷 캡쳐 프로그램, 네트워크에서 송수신되는 패킷을 모니터링 및 분석한다
+<br>
 
+![wireshark](https://github.com/solji622/LevelUp-Study/blob/0f17ee8c5e73cbd396004097cba38152c44eb1a0/25.04/TCP%20Retransmission/asset/wireshark.png)
+1. 통신 방향은 10.10.10.1 → 192.168.0.1 <br>
+2. 3번 패킷에서 `TCP Previous segment not captured` 메시지가 발생 → 패킷 유실 <br>
+3. 이후 수신 측에서 중복된 ACK(Dup ACK) 보내기 시작 <br>
+4. 3개의 Dup ACK 이후 송신 측의 빠른 재전송(Fast Retransmission) 발생 <br>
+
+<br>
+
+### ❓ Dup ACK & Fast Retransmit
+**Duplicate ACK**, 중복된 ACK로 수신 측에서 이미 받은 패킷에 대하여 Ack를 한번 더 보낸다. <br>
+이 Dup ACK가 3회 반복될 경우 재전송을 보내게 되는데, **빠른 재전송(Fast Retransmit)** 을 통하여 세그먼트를 **즉시** 전송해준다. <br>
 
 
 
