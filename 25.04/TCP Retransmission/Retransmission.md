@@ -51,20 +51,66 @@ TCP는 **신뢰성 있는 통신**이 가능해야하기에 자신이 보낸 데
 sampleRTT가 모여 RTT 값의 범위를 정하고 이를 기반으로 RTO를 설정한다.
 
 <br>
-<br>
-<br>
 
 ### ❓ timeout은 어떻게 설정할 수 있을까?
-RTT보다는 길게 설정해야 안정적이겠지만, TCP는 인터넷 상에서 서비스가 되기에
-네트워크 상황에 따라 RTT가 매우 상이하다.
 #### 1. timeout < RTT
-조금만 더 기다리면 ACK를 받을 수 있는데도 timeout 될 수도 있다 > 불필요한 재전송 잦아짐 <br>
+> 조금만 더 기다리면 ACK를 받을 수 있는데도 timeout 될 수도 있다 > 불필요한 재전송 잦아짐 <br>
 
 #### 2. timeout > RTT
-충분히 RTT의 가변적인 상황을 커버할 수 있겠지만, 세그먼트 손실 시 처리가 느려질 수 있다 <br>
+> 충분히 RTT의 가변적인 상황을 커버할 수 있겠지만, 세그먼트 손실 시 처리가 느려질 수 있다 <br>
 <br>
 
+![timeout](https://github.com/solji622/LevelUp-Study/blob/a73e0aa1cb7b58021e74f726ae4860b82eb2600b/25.04/TCP%20Retransmission/asset/RTT_timeout.jpg)
 
+<br>
+
+RTT보다는 길게 설정해야 그나마 안정적이겠지만, TCP는 인터넷 상에서 서비스가 되기에 <br>
+네트워크 상황에 따라 RTT가 매우 상이하고 불규칙적이다. <br>
+
+따라서 TCP는 sampleRTT의 평균 값인 **Estimated RTT**를 계산한다. <br>
+새로운 sampleRTT를 획득하자마자 TCP는 아래 공식에 따라 Estimated RTT를 계산한다. <br>
+<br>
+**`EstimatedRTT = (1 - α) * EstimatedRTT + α * SampleRTT`**
+<br><br>
+이 공식은 지수 가중 이동 평균(Exponential Weighted Moving Average) 방식으로 RTT를 계속 보정해가며 안정적인 RTO를 계산한다. <br>
+α(알파)는 가중치 계수로 **작을 수록 과거의 값에 더 의존**하고, **클수록 최신 측정값(sampleRTT)에 민감하게 반응**한다. <br>
+<br>
+<br>
+
+그러나 이 식은 **평균값**을 기반으로 하기에 통계적으로 **극단적인 값**에 영향을 받기 쉬워진다. <br>
+> 예를 들어서 네트워크 지연으로 인해 sampleRTT가 평균 100ms인데 800ms가 측정되었다면 <br>
+> 이 값이 EstimatedRTT를 확 끌어올려버리기 때문에 다음 RTO 설정이 과하게 커질 수 있고 <br>
+> 불필요하게 응답을 오래 기다리게 된다. <br>
+
+<br>
+<br>
+
+때문에 추가적으로 RTT의 변동성까지 고려하여 **편차와 함께 계산**하는 방식이 나타났다. <br>
+<br>
+**`DevRTT = (1 - β) * DevRTT + β * |SampleRTT - EstimatedRTT|`**
+<br><br>
+이 공식도 Estimated RTT 계산 공식과 동일한 방식이며 β(베타)는 알파와 똑같이 가중치 계수이다. <br>
+`|SampleRTT - EstimatedRTT|`는 예측과 실제 간의 절댓값 차이, 오차를 의미하며 <br>
+RTT가 예측값과 **많이 다르면, DevRTT가 커지고** RTT가 **안정적이라면, DevRTT는 작게 유지**된다. <br>
+<br>
+만약 **DevRTT가 크면 TCP는 RTT 예측이 불안정하다고 판단**하고, <br>
+그에 따라 RTO를 더 여유 있게 설정하게 된다. <br>
+<br>
+***
+<br>
+
+### 💡 최종적으로 timeout값은 어떻게 정할까?
+**`TimeoutInterval = EstimatedRTT + 4 * DevRTT`** <br>
+<br>
+`4 * DevRTT`를 더하는 이유는 **RTT의 큰 변동에도 안정적으로 대응**하기 위해서다. <br>
+즉, 네트워크 상황에 문제가 생겨도 TCP가 성급하게 재전송하지 않도록 여유를 주는 것이다. <br>
+
+<br>
+<br>
+<br>
+<br>
+
+## 📌 재전송 최적화 알고리즘
 
 
 
