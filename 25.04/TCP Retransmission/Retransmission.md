@@ -41,15 +41,28 @@ TCP는 **신뢰성 있는 통신**이 가능해야하기에 자신이 보낸 데
 <br>
 
 
-## 📌 RTO(Retransmission Timeout)란?
+## 📌 RTO(Retransmission Timeout)
 패킷 유실 후 재전송이 일어나고, **재전송에 대한 ACK를 얼마나 기다려야 하는지에 대한 값**을 의미한다. <br>
 보통 운영체제마다 별도의 초기값을 가지지만 네트워크에 따라 동적으로 변경되는데 이때 **RTT**에 의해 변한다. <br>
 <br>
 
-### ❓ RTT(Round Trip Time)란?
-호스트 간 송신에 대한 응답(ACK)을 받기까지 걸리는 시간
+### ❓ sampleRTT(Round Trip Time)
+호스트 간 송신에 대한 응답(ACK)을 받기까지 걸리는 시간을 측정하는 것
+sampleRTT가 모여 RTT 값의 범위를 정하고 이를 기반으로 RTO를 설정한다.
 
-#### ❓ sampleRTT?
+<br>
+<br>
+<br>
+
+### ❓ timeout은 어떻게 설정할 수 있을까?
+RTT보다는 길게 설정해야 안정적이겠지만, TCP는 인터넷 상에서 서비스가 되기에
+네트워크 상황에 따라 RTT가 매우 상이하다.
+#### 1. timeout < RTT
+조금만 더 기다리면 ACK를 받을 수 있는데도 timeout 될 수도 있다 > 불필요한 재전송 잦아짐 <br>
+
+#### 2. timeout > RTT
+충분히 RTT의 가변적인 상황을 커버할 수 있겠지만, 세그먼트 손실 시 처리가 느려질 수 있다 <br>
+<br>
 
 
 
