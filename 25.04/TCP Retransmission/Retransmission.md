@@ -209,5 +209,30 @@ AIMD보다 효율적으로 동작하나, 처음에 하나씩 전송하는 것 �
 
 <img src="https://github.com/solji622/LevelUp-Study/blob/70ac9fb4bc04db1470ceffbd4e01c0cd91772e00/25.04/TCP%20Retransmission/asset/tahoe-ssthresh.png" width="70%">
 
+검정색 선이 ssthresh로, Timeout이나 3 ACK가 발생할 때마다 **윈도우는 1로,** <br>
+ssthresh는 이전 혼잡 상황 발생 시 **윈도우 크기의 절반으로** 줄어든다. <br>
+하지만 혼잡 상황 발생 시마다 윈도우를 1로 초기화해 다시 증가시키는 부분이 비효율적이다. <br>
+이러한 점을 개선 시키기 위해 **빠른 회복을 적용한 TCP Reno**가 존재한다. <br>
 
+<br>
+
+#### 2. TCP Reno
+Tahoe와 동일하지만 3 ACK와 Timeout을 **구분해서 대응**하는 점에서 차이가 난다. <br>
+3 ACK 발생 시 윈도우 크기를 1로 초기화하지 않고 **AIMD처럼 윈도우 크기를 절반**으로 줄이며 <br>
+ssthresh 값 역시 **줄어든 윈도우 값으로 설정**한다. <br>
+Timeout 발생 시 Tahoe와 동일하게 사이즈를 1로 줄이고 Slow start 를 시작하지만 **ssthresh 값은 변경되지 않는다.** <br>
+
+<img src="https://github.com/solji622/LevelUp-Study/blob/3a222428d7ae9539c30aed127fad62178836ec78/25.04/TCP%20Retransmission/asset/reno-ssthresh.png" width="70%">
+
+<br>
+<br>
+<br>
+
+***
+<br>
+<br>
+
+## 👾 결론적으로
+TCP의 재전송은 단순히 패킷을 다시 보내는 기술이 아닌 망의 상태를 파악하고 <br>
+네트워크 혼잡을 완화하고 네트워크 전체의 안정성과 성능을 유지하려는 핵심 기능으로 이해할 수 있다. <br>
 
