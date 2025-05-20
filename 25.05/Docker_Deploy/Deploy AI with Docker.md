@@ -8,7 +8,7 @@
 #### ▪️ 컨테이너(Container)
 > Docker는 하나의 컴퓨터 환경 내에서 여러 개의 미니 컴퓨터 환경 구성이 가능한데 <br>
 > 여기서 **'미니 컴퓨터'** 의 역할을 하는 것이다. <br>
-> 이는 어떤 환경에서나 실행이 가능하게 **필요한 모든 요소를 포함하는 소프트웨어 패키지**라 볼 수 있다.
+> 미니 컴퓨터는 어떤 환경에서나 실행이 가능하게 **필요한 모든 요소를 포함하는 소프트웨어 패키지**라 볼 수 있다.
 
 <br>
 <br>
@@ -60,13 +60,13 @@ if __name__ == "__main__":
 ```
 <br>
 
-**`classifier = pipeline("sentiment-analysis")` 에서 다른 모델을 로딩할 수도 있다.** <br>
+**`classifier = pipeline("sentiment-analysis")` : 모델 로딩, 물론 다른 모델도 가능** <br>
 
 **1.** 트랜스포머 파이프라인의 태스크명을 변경하여 사용하기 <br>
-  : 텍스트 분류(text-classification), 개체명 인식(ner), 질문 답변(question-answering), 번역(translation) 등 다양한 태스크 존재 <br>
+  &nbsp; : 텍스트 분류(text-classification), 개체명 인식(ner), 질문 답변(question-answering), 번역(translation) 등 다양한 태스크 존재 <br>
 
 **2.** 허깅페이스 허브의 특정 모델 이름 직접 지정하기 (불러오기) <br>
-  : 파이프라인에 `model=` 인자를 넣어 모델 불러오기 가능
+   &nbsp; : 파이프라인에 `model=` 인자를 넣어 모델 불러오기 가능
 
 
 <br>
@@ -82,3 +82,97 @@ if __name__ == "__main__":
 
 ### 👾 Dockerfile
 > Docker 이미지를 만들 때 활용하는 것, 즉 이미지를 만들게 해주는 파일.
+
+``` dockerfile
+FROM python:3.9
+WORKDIR /app
+COPY . . 
+RUN pip install flask transformers torch # 이미지 생성 시 flask 트랜스포머 다운로드
+EXPOSE 5000 
+CMD ["python", "app.py"]
+```
+
+<br>
+<br>
+
+### 👾 이미지 빌드하여 컨테이너 실행하기
+```bash
+docker build -t ai-flask-api . # 이미지 빌드
+docker run -p 5000:5000 ai-flask-api # 컨테이너 실행
+```
+
+<br>
+<br>
+
+### 👾 API 테스트 해보기
+```bash
+curl -X POST http://localhost:5000/predict \
+     -H "Content-Type: application/json" \
+     -d '{"text": "진짜 좋아요!"}'
+```
+
+결과로는 터미널에 JSON 형태로 표시된다.
+
+<br>
+<br>
+<br>
+
+***
+
+<br>
+<br>
+
+## 💡 실제 웹 프로젝트에 적용한다면?
+### 👾 REST API 호출
+``` javascript
+fetch("http://localhost:5000/predict", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ text: userInput }),
+})
+.then(response => response.json())
+.then(data => {
+  console.log(data); // 예측 결과 처리
+})
+.catch(error => {
+  console.error("API 요청 실패:", error);
+});
+
+```
+
+<br>
+<br>
+
+### 👾 입력 폼 구현
+```html
+<input id="textInput" type="text" placeholder="텍스트 입력">
+<button onclick="sendText()">분석하기</button>
+<div id="result"></div>
+
+<script>
+    function sendText() {
+        const button = document.querySelector("button");
+        button.disabled = true;
+        document.getElementById("result").innerText = "분석 중...";
+        
+        const text = document.getElementById("textInput").value;
+        fetch("http://localhost:5000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text }),
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("result").innerText = JSON.stringify(data);
+        })
+        .catch(() => {
+            document.getElementById("result").innerText = "서버 오류가 발생했습니다.";
+        })
+        .finally(() => {
+            button.disabled = false;
+        });
+    }
+</script>
+```
+
+
