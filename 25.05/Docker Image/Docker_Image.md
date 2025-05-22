@@ -56,6 +56,7 @@ R/W 레이어에 저장되는 과정을 통해 여러 컨테이너를 실행하�
 <br>
 <br>
 <br>
+<br>
 
 ## 📌 레이어 구조
 ![레이어 구조](https://github.com/solji622/LevelUp-Study/blob/b0af8ac7ff408a3139f9941e4b10b6df4a7023ab/25.05/Docker%20Image/asset/layers.png)
@@ -65,11 +66,117 @@ R/W 레이어에 저장되는 과정을 통해 여러 컨테이너를 실행하�
 
 ### 2. Intermediate Layer (중간 레이어)
 Dockerfile의 명령어들이 실행되면서 만들어진 레이어들 <br>
-이 레이어가 위에서 설명한 변경 사항이 쌓이는 레이어들이다. <br>
+이 레이어가 위에서 설명한 변경 사항이 쌓이는 레이어(read-only)들이다. <br>
 <br>
 
 ### 3. Final Layer (최종 레이어)
 컨테이너 실행 시 Docker가 자동으로 덧붙이는 최종 실행 계층 <br>
 읽기/쓰기 전용 레이어라고 부르며, 컨테이너만 가지는 부분이다. <br>
 
+<br>
+<Br>
+<Br>
+<br>
 
+## 📌 Dockerfile과 레이어의 관계
+```dockerfile
+FROM node
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["node", "app.js"]
+```
+`FROM` 베이스 이미지 레이어 <br>
+`COPY` 파일 복사 레이어 <br>
+`RUN` 의존성 설치 레이어 <br>
+<br>
+
+> **⚠️ 명령 순서를 바꾸면 캐시가 깨진다** <br>
+> Docker는 이미지 빌드 시 이전 빌드 내용을 캐시에 저장해놓기에 <br>
+> 똑같은 명령어면 **재실행 대신 캐시를 재사용**하여 빠르게 끝낸다. <br>
+> 이때, 명령어 순서가 바뀌면 캐시가 깨지고 **뒤의 명령어들이 전부 다시 실행**되기에 <br>
+> 빌드 시간이 오래 걸릴 수 있다 <br>
+
+<br>
+
+결론적으로 Dockerfile은 **명령어 하나당 레이어가 각각 하나씩 생성**되며 <br>
+이미지가 **명령 순서대로 레이어들이 쌓여가면서** 하나의 이미지가 됨을 의미한다. <br>
+이때문에 Dockerfile의 명령 순서와 내용 변경은 이미지 구조와 캐시에 직접적인 영향을 준다. <br>
+
+<br>
+<br>
+<br>
+<br>
+
+## 💡 이미지를 최적화 하려면?
+### 1. 불필요한 파일 제외 (.dockerignore)
+**`.dockerignore`** 파일에 제외할 파일명을 적으면 해당 파일을 제외하고 빌드할 수 있다! <br>
+보통 `.git`, `node_modules`, `README.md` 을 제외하며, 불필요한 파일을 제외해야 이미지가 가벼워진다. <br>
+<br>
+<br>
+
+### 2. RUN 명령어는 한 줄에 작성
+```dockerfile
+# 합치기 전
+RUN npm install
+RUN npm run build
+
+# 합친 후
+RUN npm install && npm run build
+```
+명령어 하나당 레이어 하나가 생성되는 특성을 이용하여 RUN 명령어를 하나로 처리하면 <br>
+불필요한 레이어가 줄어 이미지도 더 가벼워지고 캐시도 더 효율적으로 작동할 수 있게 된다. <br>
+<br>
+<br>
+
+### 3. Multi-stage build 사용
+**빌드 전용** 이미지와 **실행 전용** 이미지를 별도로 생성하여 관리하는 방법
+
+```dockerfile
+# 빌드 전용
+FROM node AS builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install
+RUN npm run build
+
+
+# 실행 전용 (최종 이미지)
+FROM node:18-slim
+
+WORKDIR /app
+
+# 빌드된 파일과 실행에 필요한 최소한만 복사
+COPY --from=builder /app/app.js ./app.js
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/node_modules ./node_modules
+
+EXPOSE 3000
+
+CMD ["node", "app.js"]
+```
+1. 빌드 전용 : npm install, npm run build만 실행
+2. 실행 전용 : 빌드 결과물과 package.json만 복사 → 실행에 필요한 것만 들어간다 
+
+> 최종 이미지에서는 빌드 도구와 테스트 도구가 포함되지 않기에 보안에도 좋고, <br>
+> 용도에 맞게 나누었기에 이미지가 작아져 빠른 빌드와 배포가 가능해지는 장점이 있다.
+
+<br>
+
+#### 🤔 .dockerignore랑 비슷하지않나?
+> .dockerignore는 **처음부터 복사하지 않을 파일을 제외**하고 <br>
+> Multi-stage Build는 **필요한 결과물만 최종 이미지에 포함한다는 점**에서 차이가 존재한다. <br>
+
+자세하게 알아보면 .dockerignore는 Docker build context 자체에 포함하지 않는다는 의미, <br>
+Multi-stage build는 node_modules, 빌드 도구 등을 빌드 단계에서만 사용하고 최종 단계엔 dist 폴더만 넣는다는 의미라 볼 수 있다. <br>
