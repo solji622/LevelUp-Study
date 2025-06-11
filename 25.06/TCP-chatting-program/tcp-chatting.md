@@ -29,31 +29,40 @@
 import socket
 import threading
 
+# 연결된 클라이언트 소캣 저장 리스트
 clients = []
 
+# 한 클라이언트가 보낸 메시지를, 나머지 클라이언트들에게 뿌려주는 함수
 def broadcast(message, sender_soc):
     for client in clients:
+
+        # 이미 메시지가 전송된 클라이언트 제외 모든 클라이언트들에게 메시지 전송
         if client != sender_soc:
             try:
                 client.send(message)
             except:
                 client.close()
                 clients.remove(client)
-
+```
+```python 
+# 한 클라이언트가 서버와 통신하는 모든 과정을 처리하는 함수 (1:1 통신 담당)
 def handle_client(client_soc):
     while True:
         try:
             message = client_soc.recv(1024)
             if not message:
                 break
+            # 메시지 받으면 broadcast()로 뿌림림
             broadcast(message, client_soc)
         except:
             break
+    # 오류나 연결 종료 시 리스트에서 제거
     clients.remove(client_soc)
     client_soc.close()
-
+```
+``` python
+# 서버 소캣 생성 > 바인딩 > 연결 대기
 server_soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
 server_soc.bind(('0.0.0.0', 55555))
 server_soc.listen()
 
@@ -62,18 +71,23 @@ print('Server: port 55555로 서버 실행 중...')
 while True: 
     client_soc, addr = server_soc.accept()
     print(f'접속: {addr}')
+    # 새로운 클라이언트 접속 시 clients에 추가
     clients.append(client_soc)
+
+    # 새로운 스레드를 만들어서 클라이언트를 처리하는 코드
     thread = threading.Thread(target=handle_client, args=(client_soc,))
     thread.start()
 ```
 <br>
 <br>
 
+
 ### 2. client
 ```python
 import socket
 import threading
 
+# 서버로부터 메시지를 받는 스레드
 def receive_messages(sock):
     while True:
         try: 
@@ -83,13 +97,17 @@ def receive_messages(sock):
             print(message)
         except:
             break
-
+```
+```python
 name = input('닉네임 입력: ')
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(('localhost', 55555))
 
+# 백그라운드에서 서버로부터 메시지 계속 듣는 스레드 실행
 threading.Thread(target=receive_messages, args=(client,), daemon=True).start()
-
+```
+```python
+# 사용자 입력을 서버로 전송, exit 입력 시 종료
 while True:
     try:
         msg = input()
@@ -121,6 +139,7 @@ COPY server.py .
 
 EXPOSE 55555
 
+# 컨테이너 실행 시 `python server.py` 실행
 CMD ["python", "server.py"]
 ```
 <br>
@@ -150,6 +169,7 @@ services:
 
   chat_client:
     build: ./client
+    # 입력 함수와 가상 터미널 사용 가능으로 지정
     stdin_open: true
     tty: true
     networks:
@@ -158,3 +178,25 @@ services:
 networks:
   chatnet:
 ```
+
+<br>
+<br>
+<br>
+<br>
+
+## 📌 프로그램 실행
+```bash
+docker compose build
+
+# 서버 컨테이너 실행
+docker compose up chat_server
+
+# 클라이언트 컨테이너 실행
+docker compose run --rm chat_client
+```
+클라이언트의 경우 여러 개의 터미널을 열어 실행할 수 있다. <br>
+서로 다른 닉네임을 입력하여 메시지를 보내보면 실시간으로 주고받기가 가능한 걸 볼 수 있다. <br>
+
+<br>
+<Br>
+
