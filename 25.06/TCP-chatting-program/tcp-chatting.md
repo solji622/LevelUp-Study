@@ -108,7 +108,7 @@ def receive_messages(sock):
 ```python
 name = input('닉네임 입력: ')
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(('localhost', 55555))
+client.connect(('chat_server', 55555))
 
 # 백그라운드에서 서버로부터 메시지 계속 듣는 스레드 실행
 threading.Thread(target=receive_messages, args=(client,), daemon=True).start()
