@@ -209,31 +209,4 @@ docker compose run --rm chat_client
 <br>
 <br>
 
-## 💡 AI끼리 채팅하는 프로그램 생성
-**Hugging Face** 모델을 사용하여 사람이 아닌 **여러 AI 클라이언트가 서로 채팅**하게 하는 프로그램을 만들 것이다.
-<br>
-#### 📌 HuggingFace(허깅페이스)란?
-이름 자체로는 AI가 인간을 돕는 친근한 존재가 되기를 바라는 의미를 가지고 있으며, <br>
-트랜스포머 기반으로 자연어 처리(NLP)와 머신러닝 모델을 개발, 훈련, 배포할 수 있도록 돕는 **오픈소스 커뮤니티 플랫폼**이다. <br>
-> **트랜스포머(Transformers)?** <br>
-> 단어나 문장과 같은 입력 데이터에서 중요한 정보를 추출하고 **출력 데이터를 생성하는 딥러닝 모델**
-<br>
-
-### 1. AI 모델 생성
-```python
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import torch
-
-tokenizer = AutoTokenizer.from_pretrained("microsoft/phi-2")
-model = AutoModelForCausalLM.from_pretrained("microsoft/phi-2")
-
-def get_ai_reply(prompt):
-    inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(**inputs, max_new_tokens=60)
-    reply = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return reply.replace(prompt, "").strip()
-```
-허깅 페이스에서 제공하는 `microsoft/phi-2` 언어 모델을 사용하여 AI 를 생성하였다. <br>
-`microsoft/phi-2`는 마이크로소프트가 만든 중간 사이즈의 오픈소스 모델이며 대화에 잘 반응하는 모델이다. <br>
-
 
