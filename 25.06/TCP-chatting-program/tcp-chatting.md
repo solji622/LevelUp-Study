@@ -11,6 +11,7 @@ TCP는 **신뢰성 있는 연결**을 보장해주는 프로토콜이다. <br>
 
 
 ![서버와 클라이언트](https://github.com/solji622/LevelUp-Study/blob/7dca52f34bd1a609a281f7a7e329a1793e426d27/25.06/TCP-chatting-program/asset/server_client.png)
+<br>
 기본적으로 서버와 클라이언트는 1:1연결을 전제로 한다. <br>
 하지만 구현하려는 채팅 프로그램은 나와 상대방, 최소 두 클라이언트가 하나의 서버에 연결되어야 한다. <br>
 이런 경우, 여러 클라이언트를 서버는 어떻게 처리할까? <br>
