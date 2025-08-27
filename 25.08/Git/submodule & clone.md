@@ -25,7 +25,10 @@ git submodule add [repository-url] [path]
 [repository-url] 추가하려는 서브모듈의 Git 저장소 URL <br>
 [path] 서브모듈 포함시킬 하위 디렉토리
 <br>
-이 시점에서 `.gitmodules` 파일이 자동 생성된다.
+이 시점에서 `.gitmodules` 파일이 자동 생성된다. <br>
+> **`.gitmodules` 파일이란?** <br>
+git에서 서브모듈을 정의하는 설정(경로, 브랜치 등) 파일 <br>
+서브모듈 갯수만큼 생성되고 `.gitignore` 파일처럼 버전을 관리함
 
 <br>
 &nbsp;
@@ -64,7 +67,7 @@ git submodule update --remote
 <br>
 &nbsp;
 
-**(4) 서브모듈 커밋 반영**
+**(4) 서브모듈 커밋 반영** <br>
 서브모듈에서 변경 사항이 생길 경우 메인 repo는 서브모듈이 **어떤 커밋을 가리키는지** 만 기억한다. <br>
 항상 메인 repo에 반영하기 위해서는 아래의 명령어를 실행해야 한다. <br>
 ```
@@ -73,6 +76,32 @@ git pull origin main # 원격저장소의 최신 커밋을 받아옴
 cd ..
 git commit -m "Update submodule to latest" # 커밋 메시지 지정
 ```
+
+<br>
+&nbsp;
+
+**(5) 서브모듈 제거**
+```
+git rm -f libs/lib-repo
+```
+명령어 실행 시 `.gitmodules` 에 작성된 서브모듈([submodule "libs/lib-repo"])에 대한 내용과 <br>
+해당 경로의 파일들도 함께 삭제가 된다. <br>
+하지만 이 경우에 완벽하게 삭제된 것이 아니기에 같은 이름의 모듈을 추가하려할 때 <br>
+```
+```
+다음과 같은 에러가 발생하며 같은 이름을 사용할 수 없다고 한다. <br>
+
+
+
+
+<br>
+&nbsp;
+
+#### 💡 커밋 고정 VS 브랜치 추적
+기본적으로 서브모듈은 `update` 로 특정 커밋을 가리키며 안정성을 보장한다. <br>
+하지만 `branch` 옵션 추가로 특정 브랜치를 따라가며 항상 최신 버전을 유지할 수도 있다. <br>
+어느 상황에서 무엇을 선택하면 좋을까? <br>
+
 
 <br>
 <br>
