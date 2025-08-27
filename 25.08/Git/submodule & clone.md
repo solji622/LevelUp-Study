@@ -18,36 +18,61 @@
 <br>
 
 ### □ Submodule 사용하기
-**(1) 서브모듈을 포함시키고자 하는 Git 저장소에서 명령어를 실행하여 서브모듈을 추가한다.**
+**(1) 프로젝트에 서브모듈을 추가**
 ```
 git submodule add [repository-url] [path]
 ```
 [repository-url] 추가하려는 서브모듈의 Git 저장소 URL <br>
 [path] 서브모듈 포함시킬 하위 디렉토리
 <br>
-&nbsp;
-
-**(2) 서브모듈을 초기화하고 업데이트한다.**
-```
-git submodule init
-git submodule update
-```
-
-(2-1) 서브모듈을 업데이트한다.
-```
-git submodule update --remote
-```
-> **(2)와의 차이는?** <br>
-> (2)는 프로젝트 빌드, (2-1)은 서브모듈 자체를 최신 코드로 업데이트하는 것이다.
+이 시점에서 `.gitmodules` 파일이 자동 생성된다.
 
 <br>
 &nbsp;
 
-**(3) 서브모듈의 상태(변경 사항)을 확인한다.**
+**(2) 서브모듈이 등록된 프로젝트에서 모듈 세팅**
 ```
-git submodule status
+# .gitmodules 내용을 로컬 설정에 등록
+git submodule init
+
+# 메인 repo가 가리키는 커밋을 기준으로 서브모듈 가져옴
+git submodule update
 ```
-업데이트 전에 항상 상태 확인을 하여 업데이트 여부를 판단한다.
+서브모듈이 등록된 프로젝트를 다른 사람이 clone 받았을 때, 서브모듈까지 세팅해주어야 한다. <br>
+보통 `git submodule update --init --recursive` 으로 합쳐서 사용하기도 한다.
+
+<br>
+&nbsp;
+
+**(3) 서브모듈 최신화**
+```
+git submodule update --remote
+```
+메인 repo가 지정한 커밋이 아닌 서브모듈 원격 저장소의 최신 브랜치를 당기고 싶을 때 사용한다. <br>
+기본적으로 `.gitmodules` 파일에 적힌 브랜치 기준으로 최신화가 진행되며 <br>
+만약 브랜치가 지정되어 있지 않은 경우 보통 `master`(또는 `main`)을 따라간다. <br>
+<br>
+(3-1) 브랜치를 지정하고 싶다면? <br>
+```
+[submodule "libs/lib-repo"]
+  path = libs/lib-repo
+  url = https://github.com/example/lib-repo.git
+  branch = develop
+```
+이 경우 `--remote` 실행 시 `develop` 최신 버전까지 당겨온다.
+
+<br>
+&nbsp;
+
+**(4) 서브모듈 커밋 반영**
+서브모듈에서 변경 사항이 생길 경우 메인 repo는 서브모듈이 **어떤 커밋을 가리키는지** 만 기억한다. <br>
+항상 메인 repo에 반영하기 위해서는 아래의 명령어를 실행해야 한다. <br>
+```
+cd [submodule-path]
+git pull origin main # 원격저장소의 최신 커밋을 받아옴
+cd ..
+git commit -m "Update submodule to latest" # 커밋 메시지 지정
+```
 
 <br>
 <br>
