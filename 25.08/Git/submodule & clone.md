@@ -88,10 +88,16 @@ git rm -f libs/lib-repo
 해당 경로의 파일들도 함께 삭제가 된다. <br>
 하지만 이 경우에 완벽하게 삭제된 것이 아니기에 같은 이름의 모듈을 추가하려할 때 <br>
 ```
+A git directory for 'build/url-to-pdf' is found locally with remote(s):
+
+If you want to reuse this local git directory instead of cloning again from git@github.com...
+
+use the '--force' option. If the local git directory is not the correct repo
+or you are unsure what this means choose another name with the '--name' option.
 ```
 다음과 같은 에러가 발생하며 같은 이름을 사용할 수 없다고 한다. <br>
-
-
+<br>
+이때 숨김 폴더인 `.git/modules/` 하위로 들어가 삭제한 모듈의 폴더를 지워주면 모두 제거가 된다.
 
 
 <br>
@@ -101,7 +107,17 @@ git rm -f libs/lib-repo
 기본적으로 서브모듈은 `update` 로 특정 커밋을 가리키며 안정성을 보장한다. <br>
 하지만 `branch` 옵션 추가로 특정 브랜치를 따라가며 항상 최신 버전을 유지할 수도 있다. <br>
 어느 상황에서 무엇을 선택하면 좋을까? <br>
+<br>
 
+**(1) 커밋 고정**
+- 프로젝트 빌드 및 배포 시 항상 동일한 상태를 보장하고 싶을 때
+- 서브모듈 업데이트로 인한 예기치 않은 오류를 방지하고 싶을 때
+<br>
+
+**(2) 브랜치 추적**
+- 서브모듈이 활발하게 개발되고 있고, 항상 최신 기능을 반영하고 싶을 때
+- CI/CD 환경에서 자동으로 최신 버전 반영이 필요할 때
+  
 
 <br>
 <br>
@@ -139,17 +155,19 @@ git clone <리포지토리 주소> <경로>
   ```
   git clone --depth 1 <리포지토리 주소>
   ```
-  `--depth 1`은 저장소의 가장 최신 커밋 1개만 복제한다. 보통 CI/CD에서 빌드 시간을 줄일 때도 사용된다.
+  `--depth 1`은 저장소의 가장 최신 커밋 1개만 복제한다. <br>
+  `--single-branch` 옵션을 추가하면 필요없는 브랜치 기록은 복제 대상에서 제외된다. <br>
+  하지만 과거 커밋 접근이 필요할 땐 적합하지 않다는 단점이 존재한다. <br>
 
   <br>
   
 - **`--branch`** <br>
   <br>
-  특정 브랜치를 복제한다. `-b`로 줄여 사용할 수 있다.
+  특정 브랜치를 복제, clone 후 체크아웃할 브랜치를 지정한다. `-b`로 줄여 사용할 수 있다.
   ```
   git clone --branch branch_name <리포지토리 주소>
   ```
-  branch_name이라는 브랜치만 복제한다. 단순히 특정 브랜치 복제가 아닌 기본적으로 전체를 복제하되 그 브랜치를 체크아웃한 상태를 의미한다.
+  branch_name이라는 브랜치만 복제한다.
   
 <br>
 
@@ -186,7 +204,9 @@ git submodule foreach git checkout master
 # 원격 저장소(origin)의 master 브랜치 최신 커밋을 가져와서 병합
 git submodule foreach git pull origin master
 ```
-
+  
+<br>
+<br>
 
 
 
