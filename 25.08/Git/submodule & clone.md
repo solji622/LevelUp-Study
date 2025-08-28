@@ -26,9 +26,6 @@ git submodule add [repository-url] [path]
 [path] 서브모듈 포함시킬 하위 디렉토리
 <br>
 이 시점에서 `.gitmodules` 파일이 자동 생성된다. <br>
-> **`.gitmodules` 파일이란?** <br>
-git에서 서브모듈을 정의하는 설정(경로, 브랜치 등) 파일 <br>
-서브모듈 갯수만큼 생성되고 `.gitignore` 파일처럼 버전을 관리함
 
 <br>
 &nbsp;
@@ -68,7 +65,7 @@ git submodule update --remote
 &nbsp;
 
 **(4) 서브모듈 커밋 반영** <br>
-서브모듈에서 변경 사항이 생길 경우 메인 repo는 서브모듈이 **어떤 커밋을 가리키는지** 만 기억한다. <br>
+서브모듈에서 변경 사항이 생길 경우 메인 repo는 서브모듈이 **어떤 커밋을 가리키는지** 만 기억하기에 다른 사람이 clone 했을 때 변경이 반영되지 않는다.<br>
 항상 메인 repo에 반영하기 위해서는 아래의 명령어를 실행해야 한다. <br>
 ```
 cd [submodule-path]
@@ -88,7 +85,7 @@ git rm -f libs/lib-repo
 해당 경로의 파일들도 함께 삭제가 된다. <br>
 하지만 이 경우에 완벽하게 삭제된 것이 아니기에 같은 이름의 모듈을 추가하려할 때 <br>
 ```
-A git directory for 'build/url-to-pdf' is found locally with remote(s):
+A git directory for 'libs/lib-repo' is found locally with remote(s):
 
 If you want to reuse this local git directory instead of cloning again from git@github.com...
 
@@ -102,6 +99,35 @@ or you are unsure what this means choose another name with the '--name' option.
 
 <br>
 &nbsp;
+
+#### 💡 서브모듈을 사용할 때 어떤 파일과 폴더가 생성될까
+> **`.gitmodules`**  <br>
+git에서 서브모듈을 정의하는 설정(경로, 브랜치 등) 파일 <br>
+서브모듈 갯수만큼 생성되고 `.gitignore` 파일처럼 버전을 관리함<br>
+
+> **`.git/config`** <br>
+로컬 환경에서 사용하는 설정 파일, 위 (2)에서의 모듈 세팅 때 <br>
+init 하는 시점에서 해당 파일에 `gitmodules`에 있는 내용이 복사됨. <br>
+개인별 설정(HTTPS -> SSH URL 변경 등)을 이 파일에서 관리가 가능함. <br>
+
+> **`.git/modules`** <br>
+서브모듈 자체의 Git 메타데이터 저장소, 각 모듈별 독립적인 `.git` 폴더가 위치함. <Br>
+메인 저장소에서는 단순히 특정 커밋을 가리키고, 실제 서브모듈의 git 데이터는 이 디렉터리에 저장됨. <br>
+<br>
+
+**⚠️ 동작 흐름** <br>
+
+**`git submodule init`**: `.gitmodules` → `.git/config`로 설정 복사 <br>
+
+**`git submodule update`**: 메인 repo가 기억하는 커밋을 기준으로 `.git/modules`의 데이터에서 워킹 디렉터리 체크아웃. <br>
+
+따라서 서브모듈은 항상 특정 커밋에 고정된 상태로 동작한다.
+<br>
+
+
+<br>
+&nbsp;
+
 
 #### 💡 커밋 고정 VS 브랜치 추적
 기본적으로 서브모듈은 `update` 로 특정 커밋을 가리키며 안정성을 보장한다. <br>
@@ -117,7 +143,10 @@ or you are unsure what this means choose another name with the '--name' option.
 **(2) 브랜치 추적**
 - 서브모듈이 활발하게 개발되고 있고, 항상 최신 기능을 반영하고 싶을 때
 - CI/CD 환경에서 자동으로 최신 버전 반영이 필요할 때
-  
+
+<br>
+&nbsp;
+
 
 <br>
 <br>
@@ -207,6 +236,33 @@ git submodule foreach git pull origin master
   
 <br>
 <br>
+
+### 💡 Git Clone과 Git Fork
+**(1) Git Fork** <br>
+
+다른 사람의 github repo를 내 github repo에 그대로 복제하는 것 <br>
+fork된 repo는 원본과 연결되어 있기에 원본에 변화가 생기면 fork된 repo에 반영이 가능하다. <br>
+<br>
+
+이후 원본 repo에 변경 사항을 적용하고 싶을 경우 pull request를 보내어 관리자로부터 승인을 받아야 한다. 승인이 되는 경우 원본 repo에 내 변경사항이 반영된다. 
+
+<br>
+
+**(2) 차이점** <br>
+
+가장 큰 차이점은 **어디서 진행되는지** 이다. <br>
+fork는 원격 저장소(Github)에서 진행되고, clone은 로컬 저장소에서 진행된다. <br>
+
+물론 fork를 통해 나만의 원격 저장소가 생겨나도<br>
+개발을 위해서는 clone을 통해 로컬 저장소를 만들어 진행한다. <br>
+
+> **굳이 fork를 하는 이유는 무엇일까?** <br>
+> 개발을 어떻게 진행하느냐에 따라 방식에 차이가 생긴다. <br>
+같은 베이스를 두고 진행하려면 clone을, 새로운 베이스를 만들어 <br>
+기존과 합칠 것이라면 fork를 사용하여 더 큰 구조를 만들어낸다.
+
+
+
 
 
 
