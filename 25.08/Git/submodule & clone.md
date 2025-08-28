@@ -242,7 +242,6 @@ git submodule foreach git pull origin master
 
 다른 사람의 github repo를 내 github repo에 그대로 복제하는 것 <br>
 fork된 repo는 원본과 연결되어 있기에 원본에 변화가 생기면 fork된 repo에 반영이 가능하다. <br>
-<br>
 
 이후 원본 repo에 변경 사항을 적용하고 싶을 경우 pull request를 보내어 관리자로부터 승인을 받아야 한다. 승인이 되는 경우 원본 repo에 내 변경사항이 반영된다. 
 
